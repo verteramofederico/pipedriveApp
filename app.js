@@ -26,7 +26,6 @@ cron.schedule('*/1 * * * *', () => {
 });
 
 function apiAxios () {
-    console.log("console log de api")
     var config = {
         method: 'get',
         url: `https://${urlUser}.pipedrive.com/v1/leads?limit=500&start=${startR}&api_token=${apiToken}`,
@@ -36,21 +35,25 @@ function apiAxios () {
         .then(function (response) {
         repeat=response.data.additional_data.pagination.more_items_in_collection
         LeadsAll = response.data.data 
-        console.log ("el resultado es", startR, repeat )
         })
         .then (function(){
             idLeadsToCall = [] // vaciando el array de laysToCall cada dia antes de comenzar la iteracion
             LeadsAll.forEach(element => {
-                if (
-                    element.label_ids.includes("2eb8c750-8b32-11ec-ac0c-2938be6414d0") == true /* test  */
-                    //element.label_ids.includes("a153a4e0-8b2f-11ec-b581-5f29cd529551") /* Diferente a estancado para no re-llamar */
-                    && new Date (moment().toISOString()) - new Date(element.add_time) >= 1 /* 20160 */
+                if (       
+                    // element.label_ids.includes("2eb8c750-8b32-11ec-ac0c-2938be6414d0") == true /* test  */
+                    //element.label_ids.includes("01da0ea0-8da9-11ec-b9ca-1ba0465c3859") == true /* test 3  */
+                    //element.label_ids.includes("a153a4e0-8b2f-11ec-b581-5f29cd529551") == false /* Diferente a estancado para no re-llamar */
+                    element.label_ids.length == 0
+                    && (new Date (moment().toISOString()) - new Date(element.add_time)) >= 20160
                     ){
                     idLeadsToCall.push(element.id)
                     } 
+                //console.log("element label vacio", idLeadsToCall)
+                //console.log((new Date (moment().toISOString()) - new Date(element.add_time)) >= 20160)
+                console.log(new Date (moment().toISOString()) - new Date(element.add_time) )
             });
         })     
-        .then (function (){
+ /*        .then (function (){
             idLeadsToCall.forEach(idToUpdate => {
                 var data = JSON.stringify({
                     // "label_ids": ['a153a4e0-8b2f-11ec-b581-5f29cd529551'] // ID LABEL ESTANCADO
@@ -73,12 +76,14 @@ function apiAxios () {
                         console.log(error);
                     });
             })
-        })
+        }) */
         .then (function () {
             if (repeat) {
                 startR = startR + 1
                 return apiAxios()}
-            else {startR = startR}
+            else {
+                null
+            }
         })
         .catch(function (error) {
             console.log(error);
