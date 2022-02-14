@@ -4,6 +4,7 @@ require('dotenv').config()
 var axios = require('axios');
 var cron = require('node-cron');
 var moment = require('moment'); 
+const res = require('express/lib/response');
 
 let apiToken = process.env.apiToken
 let urlUser = process.env.urlUser
@@ -27,11 +28,12 @@ function apiAxios () {
     console.log("console log de api")
     var config = {
         method: 'get',
-        url: `https://${urlUser}.pipedrive.com/v1/leads?api_token=${apiToken}`,
+        url: `https://${urlUser}.pipedrive.com/v1/leads?limit=500&start=862&api_token=${apiToken}`,
         headers: { }
         };  
         axios(config)
         .then(function (response) {
+        console.log("aditional data",response.data.additional_data)
         LeadsAll = response.data.data 
         })
         .then (function(){
@@ -39,19 +41,21 @@ function apiAxios () {
             LeadsAll.forEach(element => {
                 if (
                     element.label_ids == "2eb8c750-8b32-11ec-ac0c-2938be6414d0" /* test  */
-                    ,console.log(element)
                     //element.label_ids !== "a153a4e0-8b2f-11ec-b581-5f29cd529551" /* Diferente a estancado para no re-llamar */
                     && new Date (moment().toISOString()) - new Date(element.add_time) >= 1 /* 20160 */
                     ){
                     idLeadsToCall.push(element.id)
+                    /* eliminar log */console.log('log de ids to call',idLeadsToCall)
                     } 
             });
         })
-        /* 
+        
         .then (function (){
             idLeadsToCall.forEach(idToUpdate => {
                 var data = JSON.stringify({
-                    "label_ids": ['a153a4e0-8b2f-11ec-b581-5f29cd529551']           
+                    // "label_ids": ['a153a4e0-8b2f-11ec-b581-5f29cd529551'] // ID LABEL ESTANCADO
+                    "label_ids": ['01da0ea0-8da9-11ec-b9ca-1ba0465c3859']  // test 3 
+                    
                 });
                     var config = {
                     method: 'patch',
@@ -70,7 +74,7 @@ function apiAxios () {
                         console.log(error);
                     });
             })
-        }) */
+        })
         .catch(function (error) {
             console.log(error);
     })
