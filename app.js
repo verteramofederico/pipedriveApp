@@ -20,11 +20,10 @@ let repeat = true
 let startR = 750
 
 /* cron */
-//cron.schedule('0 11 * * *', () => {
-    cron.schedule('* * * * *', () => {
+cron.schedule('0 11 * * *', () => {
     console.log('running every day 11am');
     apiAxios()
-});
+})
 
 function apiAxios () {
     var config = {
