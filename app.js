@@ -38,19 +38,20 @@ function apiAxios () {
             idLeadsToCall = [] // vaciando el array de laysToCall cada dia antes de comenzar la iteracion
             LeadsAll.forEach(element => {
                 if (
-                    element.label_ids !== "dab1516b-a5d9-44f4-bea7-61ce64910395" /* Cold Blue  */
-                    //element.label_ids !== "f0e9f59f-07d5-4e97-b7e3-5aa4815b1f97" /* Red Hot */
-                    && new Date (moment().toISOString()) - new Date(element.add_time) >= 124 /* 20160 */
+                    element.label_ids == "2eb8c750-8b32-11ec-ac0c-2938be6414d0" /* test  */
+                    ,console.log(element)
+                    //element.label_ids !== "a153a4e0-8b2f-11ec-b581-5f29cd529551" /* Diferente a estancado para no re-llamar */
+                    && new Date (moment().toISOString()) - new Date(element.add_time) >= 1 /* 20160 */
                     ){
                     idLeadsToCall.push(element.id)
                     } 
             });
         })
+        /* 
         .then (function (){
             idLeadsToCall.forEach(idToUpdate => {
                 var data = JSON.stringify({
-                    //"label_ids": ['f0e9f59f-07d5-4e97-b7e3-5aa4815b1f97']    /* Red Hot */
-                    "label_ids": ['dab1516b-a5d9-44f4-bea7-61ce64910395']   /* Cold Blue  */         
+                    "label_ids": ['a153a4e0-8b2f-11ec-b581-5f29cd529551']           
                 });
                     var config = {
                     method: 'patch',
@@ -69,7 +70,7 @@ function apiAxios () {
                         console.log(error);
                     });
             })
-        })
+        }) */
         .catch(function (error) {
             console.log(error);
     })
