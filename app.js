@@ -17,11 +17,12 @@ app.listen(PORT, () => {
 let LeadsAll = []
 let idLeadsToCall = []
 let repeat = true
-let startR = 775
+let startR = 750
 
 /* cron */
-cron.schedule('*/1 * * * *', () => {
-    console.log('running a  every  minutes');
+//cron.schedule('0 11 * * *', () => {
+    cron.schedule('* * * * *', () => {
+    console.log('running every day 11am');
     apiAxios()
 });
 
@@ -40,24 +41,23 @@ function apiAxios () {
             idLeadsToCall = [] // vaciando el array de laysToCall cada dia antes de comenzar la iteracion
             LeadsAll.forEach(element => {
                 if (       
-                    // element.label_ids.includes("2eb8c750-8b32-11ec-ac0c-2938be6414d0") == true /* test  */
-                    //element.label_ids.includes("01da0ea0-8da9-11ec-b9ca-1ba0465c3859") == true /* test 3  */
-                    //element.label_ids.includes("a153a4e0-8b2f-11ec-b581-5f29cd529551") == false /* Diferente a estancado para no re-llamar */
-                    element.label_ids.length == 0
-                    && (new Date (moment().toISOString()) - new Date(element.add_time)) >= 20160
+                    // Diferente a estancado para no re-llamar
+                    element.label_ids.includes("a153a4e0-8b2f-11ec-b581-5f29cd529551") == false
+                    // doble check, que no tenga otro label, eso significaria en gestion
+                    && element.label_ids.length == 0
+                    // tiempo mayor a 14 dias
+                    && (new Date (moment().toISOString()) - new Date(element.add_time)) /1000 / 60 >= 20160
                     ){
+                    // si cumple las 3 condiciones integran el siguiente array para ser modificados en el siguiente .then
                     idLeadsToCall.push(element.id)
                     } 
-                //console.log("element label vacio", idLeadsToCall)
-                //console.log((new Date (moment().toISOString()) - new Date(element.add_time)) >= 20160)
-                console.log(new Date (moment().toISOString()) - new Date(element.add_time) )
-            });
+                console.log(idLeadsToCall)
+            })
         })     
- /*        .then (function (){
+        .then (function (){
             idLeadsToCall.forEach(idToUpdate => {
                 var data = JSON.stringify({
-                    // "label_ids": ['a153a4e0-8b2f-11ec-b581-5f29cd529551'] // ID LABEL ESTANCADO
-                    "label_ids": ['01da0ea0-8da9-11ec-b9ca-1ba0465c3859']  // test 3   
+                    "label_ids": ['a153a4e0-8b2f-11ec-b581-5f29cd529551'] // agregar ID LABEL ESTANCADO
                 });
                     var config = {
                     method: 'patch',
@@ -76,8 +76,9 @@ function apiAxios () {
                         console.log(error);
                     });
             })
-        }) */
+        })
         .then (function () {
+            // si la api comunica que aun quedan paginas para consultar repite funcion con pagina siguiente, si no termina el ciclo
             if (repeat) {
                 startR = startR + 1
                 return apiAxios()}
