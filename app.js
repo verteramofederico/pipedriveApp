@@ -1,3 +1,13 @@
+/* en pase a produccion cambiar: 
+1. apitoken variable env
+2. urluser variable env
+3. cambiar variable startR. (es el punto de inicio del get)
+4. minutos en condicion de axios para guardar leads. En test esta en 1, pasar a 20160
+5. configurar de cron de horario de ejecucion de la funcion diaria
+6. id de label ESTANCADO. Dos veces, primero en condicion del get y luego en el POST. 
+El id label estancado de flux es a153a4e0-8b2f-11ec-b581-5f29cd529551
+*/
+
 const express = require('express');
 const app = express();
 require('dotenv').config()
@@ -5,8 +15,9 @@ var axios = require('axios');
 var cron = require('node-cron');
 var moment = require('moment'); 
 
-let apiToken = process.env.apiToken
-let urlUser = process.env.urlUser
+
+let apiToken = process.env.apiTokenSandbox   // actualizar en produccion
+let urlUser = process.env.urlUserSandBox // actualizar en produccion
 
 const PORT = 1800;
 app.listen(PORT, () => {
@@ -17,11 +28,12 @@ app.listen(PORT, () => {
 let LeadsAll = []
 let idLeadsToCall = []
 let repeat = true
-let startR = 750
+let startR = 0 // luego en produccion cambiar a 750
+
 
 /* cron */
-cron.schedule('0 11 * * *', () => {
-    console.log('running every day 11am');
+cron.schedule('0 10 * * *', () => {
+    console.log('running every day 10am');
     apiAxios()
 })
 
@@ -41,22 +53,23 @@ function apiAxios () {
             LeadsAll.forEach(element => {
                 if (       
                     // Diferente a estancado para no re-llamar
-                    element.label_ids.includes("a153a4e0-8b2f-11ec-b581-5f29cd529551") == false
+                    element.label_ids.includes("70971a10-8e88-11ec-bff3-dd2859c94d82") == false
                     // doble check, que no tenga otro label, eso significaria en gestion
                     && element.label_ids.length == 0
                     // tiempo mayor a 14 dias
-                    && (new Date (moment().toISOString()) - new Date(element.add_time)) /1000 / 60 >= 20160
+                    && (new Date (moment().toISOString()) - new Date(element.add_time)) /1000 / 60 >= 1 // en prod. cambiar el minuto por 20160
+
                     ){
                     // si cumple las 3 condiciones integran el siguiente array para ser modificados en el siguiente .then
                     idLeadsToCall.push(element.id)
                     } 
-                console.log(idLeadsToCall)
             })
         })     
         .then (function (){
             idLeadsToCall.forEach(idToUpdate => {
                 var data = JSON.stringify({
-                    "label_ids": ['a153a4e0-8b2f-11ec-b581-5f29cd529551'] // agregar ID LABEL ESTANCADO
+                    "label_ids": ['70971a10-8e88-11ec-bff3-dd2859c94d82'] // 
+                    // "label_ids": ['a153a4e0-8b2f-11ec-b581-5f29cd529551'] // FLUX ID LABEL ESTANCADO
                 });
                     var config = {
                     method: 'patch',
