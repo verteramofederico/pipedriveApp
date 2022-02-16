@@ -60,7 +60,7 @@ function apiAxios () {
                     // doble check, que no tenga otro label, eso significaria en gestion
                     && element.label_ids.length == 0
                     // tiempo mayor a 14 dias
-                    && (new Date (moment().toISOString()) - new Date(element.add_time)) /1000 / 60 >= 1440 // en prod. cambiar el minuto por 1440
+                    && (new Date (moment().toISOString()) - new Date(element.add_time)) /1000 / 60 >= 1 // en prod. cambiar el minuto por 1440
 
                     ){
                     // si cumple las 3 condiciones integran el siguiente array para ser modificados en el siguiente .then
