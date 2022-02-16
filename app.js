@@ -2,7 +2,7 @@
 1. apitoken variable env
 2. urluser variable env
 3. cambiar variable startR. (es el punto de inicio del get)
-4. minutos en condicion de axios para guardar leads. En test esta en 1, pasar a 20160
+4. minutos en condicion de axios para guardar leads. En test esta en 1, pasar a 1440
 5. configurar de cron de horario de ejecucion de la funcion diaria
 6. id de label ESTANCADO. Dos veces, primero en condicion del get y luego en el POST. 
 El id label estancado de flux es a153a4e0-8b2f-11ec-b581-5f29cd529551
@@ -32,8 +32,8 @@ let startR = 0 // luego en produccion cambiar a 750
 
 
 /* cron */
-cron.schedule('0 15 * * *', () => {
-    console.log('running every day 11am');
+cron.schedule('0 10 * * *', () => {
+    console.log('running every day 10am');
     apiAxios()
 }, {
     scheduled: true,
@@ -60,7 +60,7 @@ function apiAxios () {
                     // doble check, que no tenga otro label, eso significaria en gestion
                     && element.label_ids.length == 0
                     // tiempo mayor a 14 dias
-                    && (new Date (moment().toISOString()) - new Date(element.add_time)) /1000 / 60 >= 1 // en prod. cambiar el minuto por 20160
+                    && (new Date (moment().toISOString()) - new Date(element.add_time)) /1000 / 60 >= 1440 // en prod. cambiar el minuto por 1440
 
                     ){
                     // si cumple las 3 condiciones integran el siguiente array para ser modificados en el siguiente .then
