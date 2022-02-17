@@ -32,7 +32,7 @@ let startR = 0 // luego en produccion cambiar a 750
 
 
 /* cron */
-cron.schedule('0 10 * * *', () => {
+cron.schedule('0 13 * * *', () => {
     console.log('running every day 10am');
     apiAxios()
 }, {
@@ -56,7 +56,7 @@ function apiAxios () {
             LeadsAll.forEach(element => {
                 if (       
                     // Diferente a estancado para no re-llamar
-                    element.label_ids.includes("70971a10-8e88-11ec-bff3-dd2859c94d82") == false
+                    element.label_ids.includes("e89901a0-8fef-11ec-b919-67f78d3111fa") == false
                     // doble check, que no tenga otro label, eso significaria en gestion
                     && element.label_ids.length == 0
                     // tiempo mayor a 14 dias
@@ -71,7 +71,7 @@ function apiAxios () {
         .then (function (){
             idLeadsToCall.forEach(idToUpdate => {
                 var data = JSON.stringify({
-                    "label_ids": ['70971a10-8e88-11ec-bff3-dd2859c94d82'] // 
+                    "label_ids": ['e89901a0-8fef-11ec-b919-67f78d3111fa'] // 
                     // "label_ids": ['a153a4e0-8b2f-11ec-b581-5f29cd529551'] // FLUX ID LABEL ESTANCADO
                 });
                     var config = {
