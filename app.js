@@ -15,9 +15,7 @@ var axios = require("axios");
 var cron = require("node-cron");
 var moment = require("moment");
 
-setTimeout(() => {
-  console.log(new Date());
-}, 5000);
+console.log(new Date());
 
 let apiToken = process.env.apiTokenSandbox; // actualizar en produccion
 let urlUser = process.env.urlUserSandBox; // actualizar en produccion
@@ -35,11 +33,12 @@ let startR = 0; // luego en produccion cambiar a 750
 
 /* cron */
 cron.schedule(
-  "45 10 * * *",
+  "0 10 * * Monday-Friday",
   () => {
-    console.log("running every day 10am");
+    console.log("running every day 8am");
     apiAxios();
   },
+
   {
     scheduled: true,
     timezone: "America/Santiago",
