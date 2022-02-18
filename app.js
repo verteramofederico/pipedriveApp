@@ -32,7 +32,7 @@ let startR = 0 // luego en produccion cambiar a 750
 
 
 /* cron */
-cron.schedule('0 13 * * *', () => {
+cron.schedule('30 10 * * *', () => {
     console.log('running every day 10am');
     apiAxios()
 }, {
