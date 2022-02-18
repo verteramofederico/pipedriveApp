@@ -8,101 +8,111 @@
 El id label estancado de flux es a153a4e0-8b2f-11ec-b581-5f29cd529551
 */
 
-const express = require('express');
+const express = require("express");
 const app = express();
-require('dotenv').config()
-var axios = require('axios');
-var cron = require('node-cron');
-var moment = require('moment'); 
+require("dotenv").config();
+var axios = require("axios");
+var cron = require("node-cron");
+var moment = require("moment");
 
+setTimeout(() => {
+  console.log(new Date());
+}, 5000);
 
-let apiToken = process.env.apiTokenSandbox   // actualizar en produccion
-let urlUser = process.env.urlUserSandBox // actualizar en produccion
+let apiToken = process.env.apiTokenSandbox; // actualizar en produccion
+let urlUser = process.env.urlUserSandBox; // actualizar en produccion
 
 const PORT = 1800;
 app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
+  console.log(`Listening on port ${PORT}`);
 });
 
 /* AXIOS HTTP Method and definitions of leads to call */
-let LeadsAll = []
-let idLeadsToCall = []
-let repeat = true
-let startR = 0 // luego en produccion cambiar a 750
-
+let LeadsAll = [];
+let idLeadsToCall = [];
+let repeat = true;
+let startR = 0; // luego en produccion cambiar a 750
 
 /* cron */
-cron.schedule('45 10 * * *', () => {
-    console.log('running every day 10am');
-    apiAxios()
-}, {
+cron.schedule(
+  "45 10 * * *",
+  () => {
+    console.log("running every day 10am");
+    apiAxios();
+  },
+  {
     scheduled: true,
-    timezone: "America/Santiago"
-})
+    timezone: "America/Santiago",
+  }
+);
 
-function apiAxios () {
-    var config = {
-        method: 'get',
-        url: `https://${urlUser}.pipedrive.com/v1/leads?limit=500&start=${startR}&api_token=${apiToken}`,
-        headers: { }
-        };  
-        axios(config)
-        .then(function (response) {
-        repeat=response.data.additional_data.pagination.more_items_in_collection
-        LeadsAll = response.data.data 
-        })
-        .then (function(){
-            idLeadsToCall = [] // vaciando el array de laysToCall cada dia antes de comenzar la iteracion
-            LeadsAll.forEach(element => {
-                if (       
-                    // Diferente a estancado para no re-llamar
-                    element.label_ids.includes("e89901a0-8fef-11ec-b919-67f78d3111fa") == false
-                    // doble check, que no tenga otro label, eso significaria en gestion
-                    && element.label_ids.length == 0
-                    // tiempo mayor a 14 dias
-                    && (new Date (moment().toISOString()) - new Date(element.add_time)) /1000 / 60 >= 1 // en prod. cambiar el minuto por 1440
-
-                    ){
-                    // si cumple las 3 condiciones integran el siguiente array para ser modificados en el siguiente .then
-                    idLeadsToCall.push(element.id)
-                    } 
-            })
-        })     
-        .then (function (){
-            idLeadsToCall.forEach(idToUpdate => {
-                var data = JSON.stringify({
-                    "label_ids": ['e89901a0-8fef-11ec-b919-67f78d3111fa'] // 
-                    // "label_ids": ['a153a4e0-8b2f-11ec-b581-5f29cd529551'] // FLUX ID LABEL ESTANCADO
-                });
-                    var config = {
-                    method: 'patch',
-                    url: `https://${urlUser}.pipedrive.com/v1/leads/${idToUpdate}?api_token=${apiToken}`,
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'Cookie': '__cf_bm=D9CpSn090T24Dfmo0uA55LFNBbjxlvsWpWgRSGJz0ns-1644505069-0-AeS5UMlWH7gHGIKSZmziZ6pHnX2f82mahMKLNEKgXR8NoqyZjJfZRPyyq2CwdnuHDc/w6suqLGaxGMJC9jnEPv4='
-                    },
-                    data : data
-                };  
-                    axios(config)
-                    .then(function (response) {
-                        console.log(JSON.stringify(response.data));
-                })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            })
-        })
-        .then (function () {
-            // si la api comunica que aun quedan paginas para consultar repite funcion con pagina siguiente, si no termina el ciclo
-            if (repeat) {
-                startR = startR + 1
-                return apiAxios()}
-            else {
-                null
-            }
-        })
-        .catch(function (error) {
-            console.log(error);
+function apiAxios() {
+  var config = {
+    method: "get",
+    url: `https://${urlUser}.pipedrive.com/v1/leads?limit=500&start=${startR}&api_token=${apiToken}`,
+    headers: {},
+  };
+  axios(config)
+    .then(function (response) {
+      repeat =
+        response.data.additional_data.pagination.more_items_in_collection;
+      LeadsAll = response.data.data;
     })
+    .then(function () {
+      idLeadsToCall = []; // vaciando el array de laysToCall cada dia antes de comenzar la iteracion
+      LeadsAll.forEach((element) => {
+        if (
+          // Diferente a estancado para no re-llamar
+          element.label_ids.includes("e89901a0-8fef-11ec-b919-67f78d3111fa") ==
+            false &&
+          // doble check, que no tenga otro label, eso significaria en gestion
+          element.label_ids.length == 0 &&
+          // tiempo mayor a 14 dias
+          (new Date(moment().toISOString()) - new Date(element.add_time)) /
+            1000 /
+            60 >=
+            1 // en prod. cambiar el minuto por 1440
+        ) {
+          // si cumple las 3 condiciones integran el siguiente array para ser modificados en el siguiente .then
+          idLeadsToCall.push(element.id);
+        }
+      });
+    })
+    .then(function () {
+      idLeadsToCall.forEach((idToUpdate) => {
+        var data = JSON.stringify({
+          label_ids: ["e89901a0-8fef-11ec-b919-67f78d3111fa"], //
+          // "label_ids": ['a153a4e0-8b2f-11ec-b581-5f29cd529551'] // FLUX ID LABEL ESTANCADO
+        });
+        var config = {
+          method: "patch",
+          url: `https://${urlUser}.pipedrive.com/v1/leads/${idToUpdate}?api_token=${apiToken}`,
+          headers: {
+            "Content-Type": "application/json",
+            Cookie:
+              "__cf_bm=D9CpSn090T24Dfmo0uA55LFNBbjxlvsWpWgRSGJz0ns-1644505069-0-AeS5UMlWH7gHGIKSZmziZ6pHnX2f82mahMKLNEKgXR8NoqyZjJfZRPyyq2CwdnuHDc/w6suqLGaxGMJC9jnEPv4=",
+          },
+          data: data,
+        };
+        axios(config)
+          .then(function (response) {
+            console.log(JSON.stringify(response.data));
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      });
+    })
+    .then(function () {
+      // si la api comunica que aun quedan paginas para consultar repite funcion con pagina siguiente, si no termina el ciclo
+      if (repeat) {
+        startR = startR + 1;
+        return apiAxios();
+      } else {
+        null;
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 }
-
