@@ -36,10 +36,11 @@ cron.schedule(
   //"45 10 * * *",       ok probado 10am
   "* * * * *", // solo en test, 1 min
   () => {
-    console.log("running every day 10am");
+    console.log("running every day 8am");
     apiAxios();
     apiAxios72hs()
   },
+
   {
     scheduled: true,
     timezone: "America/Santiago",
