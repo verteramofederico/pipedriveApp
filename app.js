@@ -67,7 +67,12 @@ function apiAxios() {
           element.label_ids.includes(`${labelEstancado}`) ==
             false &&
           // doble check, que no tenga otro label, eso significaria en gestion
-          element.label_ids.length == 0 &&
+          
+          //element.label_ids.length == 0 &&
+
+          element.label_ids.includes(`594b9260-b006-11ec-8282-b92363b31307`) ==
+            true &&
+            
           // tiempo mayor a 1 dias
           (new Date(moment().toISOString()) - new Date(element.add_time)) /
             1000 /
@@ -141,7 +146,7 @@ function apiAxios72hs() {
           (new Date(moment().toISOString()) - new Date(element.add_time)) /
             1000 /
             60 >=
-            1 // en prod. cambiar el minuto por 4320 (72hs)
+            250 // en prod. cambiar el minuto por 4320 (72hs)
         ) {
           // si cumple las 2 condiciones integran el siguiente array para ser modificados en el siguiente .then
           idLeadsToCall.push(element.id);
