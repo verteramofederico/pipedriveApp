@@ -1,11 +1,11 @@
 /* en pase a produccion cambiar: 
 1. apitoken variable env
 2. urluser variable env
-3. cambiar variable startR. (es el punto de inicio del get). Flux tiene miles de leads, por eso comienza en pagina > 750
+3. cambiar variable startR. (es el punto de inicio del get). Flux tiene miles de leads, por eso comienza en pagina > 2402
 4. minutos en condicion de axios para guardar leads. En test esta en 1, pasar a 1440
 5. configurar de cron de horario de ejecucion de la funcion diaria
 6. id de label ESTANCADO. Dos veces, primero en condicion del get y luego en el POST. 
-El id label estancado de flux es a153a4e0-8b2f-11ec-b581-5f29cd529551
+7. id del label en recuperacion en la segunda funcion. 
 */
 
 const express = require("express");
@@ -15,8 +15,8 @@ var axios = require("axios");
 var cron = require("node-cron");
 var moment = require("moment");
 
-let apiToken = process.env.apiTokenSandbox; // actualizar en produccion .env
-let urlUser = process.env.urlUserSandBox; // actualizar en produccion .env
+let apiToken = process.env.apiToken; // actualizar en produccion .env
+let urlUser = process.env.urlUser; // actualizar en produccion .env
 let labelRecuperacion = process.env.labelRecuperacion; // actualizar .env
 let labelEstancado = process.env.labelEstancado // actualizar .env
 
@@ -29,7 +29,7 @@ app.listen(PORT, () => {
 let LeadsAll = [];
 let idLeadsToCall = [];
 let repeat = true;
-let startR = 0; // luego en produccion cambiar a 750
+let startR = 2402; // luego en produccion cambiar a 2402
 
 /* cron */
 cron.schedule(
